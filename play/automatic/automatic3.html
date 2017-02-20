@@ -15,9 +15,14 @@
 				<div id="stats_text"></div>
 			</div>
 
-			i'll move if <span class="highlight">less than <span id="bias_text">33%</span></span> of my neighbors are like me
+                        [Triangle] i'll move if <span class="highlight">less than <span id="bias_text_triangle">33%</span></span> of my neighbors are like me
+                        <br>
+                        <div id="slider_triangle"></div>
+                        <br>
+
+			[Square] i'll move if <span class="highlight">less than <span id="bias_text_square">33%</span></span> of my neighbors are like me
 			<br>
-			<div id="slider"></div>
+			<div id="slider_square"></div>
 			<br>
 
 			<div class="ui" id="moving" onclick="START_SIM=!START_SIM; doneBuffer = 60; window.writeStats()"></div>
@@ -34,25 +39,34 @@
 <script>
 doneBuffer=-1;
 
-var bias_text = document.getElementById("bias_text");
+function makeSlider(slider_elem_id, bias_elem_id, is_triangle) {
+  var bias_text = document.getElementById(bias_elem_id);
+  return new DoubleSlider(document.getElementById(slider_elem_id),{
+        backgrounds:[
+                {color:"#555",icon:"ds_sad.png"},
+                {color:"#aaa",icon:"ds_happy.png"},
+                {color:"#2095dc",icon:"ds_sad.png"}
+        ],
+        values:[is_triangle ? window.TRIANGLE_BIAS : window.SQUARE_BIAS,1.02],
+        onChange:function(values){
+                
+                if (is_triangle) {
+                  window.TRIANGLE_BIAS = values[0];
+                } else {
+                  window.SQUARE_BIAS = values[0];
+                }
 
-var whatever = new DoubleSlider(document.getElementById("slider"),{
-	backgrounds:[
-		{color:"#555",icon:"ds_sad.png"},
-		{color:"#aaa",icon:"ds_happy.png"},
-		{color:"#2095dc",icon:"ds_sad.png"}
-	],
-	values:[0.33,1.02],
-	onChange:function(values){
-		
-		window.BIAS = values[0];
+                // Write stats
+                START_SIM = false;
+                window.writeStats();
+                bias_text.innerHTML = Math.round(values[0] * 100)+"%";
 
-		// Write stats
-		START_SIM = false;
-		window.writeStats();
-		bias_text.innerHTML = Math.round(window.BIAS*100)+"%";
+        }
+  });
+}
 
-	}
-});
+var whatever = makeSlider("slider_triangle", "bias_text_triangle", true);
+var whatever = makeSlider("slider_square", "bias_text_square", false);
+
 
 </script>

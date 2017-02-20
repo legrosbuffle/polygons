@@ -4,8 +4,10 @@ var ctx = canvas.getContext("2d");
 var stats_canvas = document.getElementById("stats_canvas");
 var stats_ctx = stats_canvas.getContext("2d");
 
-var NONCONFORM = 1.00;
-var BIAS = 0.33;
+var TRIANGLE_NONCONFORM = 1.00;
+var SQUARE_NONCONFORM = 1.00;
+var TRIANGLE_BIAS = 0.05;
+var SQUARE_BIAS = 0.33;
 var TILE_SIZE = 30;
 var PEEP_SIZE = 30;
 var GRID_SIZE = 20;
@@ -139,9 +141,15 @@ function Draggable(x,y){
 			}else{
 				self.sameness = 1;
 			}
-			if(self.sameness<BIAS || self.sameness>NONCONFORM){
-				self.shaking = true;
-			}
+			if (self.color=="triangle") {
+                            if(self.sameness<TRIANGLE_BIAS || self.sameness>TRIANGLE_NONCONFORM){
+                                    self.shaking = true;
+                            }
+                        } else {
+                            if(self.sameness<SQUARE_BIAS || self.sameness>SQUARE_NONCONFORM){
+                                    self.shaking = true;
+                            }
+                        }
 			if(self.sameness>0.99){
 				self.bored = true;
 			}

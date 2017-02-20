@@ -15,11 +15,17 @@
 				<div id="stats_text"></div>
 			</div>
 
-			i'll move if <span class="highlight">&lt;<span id="bias_text">33%</span></span> 
-			or <span class="highlight">&gt;<span id="nonconform_text">100%</span></span> of my neighbors are like me
+			[Triangle] i'll move if <span class="highlight">&lt;<span id="bias_text_triangle">33%</span></span> 
+			or <span class="highlight">&gt;<span id="nonconform_text_triangle">100%</span></span> of my neighbors are like me
 			<br>
-			<div id="slider"></div>
+			<div id="slider_triangle"></div>
 			<br>
+
+                        [Square] i'll move if <span class="highlight">&lt;<span id="bias_text_square">33%</span></span> 
+                        or <span class="highlight">&gt;<span id="nonconform_text_square">100%</span></span> of my neighbors are like me
+                        <br>
+                        <div id="slider_square"></div>
+                        <br>
 
 			<div class="ui" id="moving" onclick="START_SIM=!START_SIM; doneBuffer = 60; window.writeStats()"></div>
 			<div class="ui" id="reset" onclick="reset()" style="margin-left:9px"></div>
@@ -35,28 +41,40 @@
 <script>
 doneBuffer=-1;
 
-var bias_text = document.getElementById("bias_text");
-var nonconform_text = document.getElementById("nonconform_text");
+window.TRIANGLE_NONCONFORM = 0.8;
+window.SQUARE_NONCONFORM = 0.95;
 
-var whatever = new DoubleSlider(document.getElementById("slider"),{
-	backgrounds:[
-		{color:"#555",icon:"ds_sad.png"},
-		{color:"#aaa",icon:"ds_happy.png"},
-		{color:"#555",icon:"ds_sad.png"}
-	],
-	values:[0.10,0.80],
-	onChange:function(values){
-		
-		window.BIAS = values[0];
-		window.NONCONFORM = values[1];
+function makeSlider(slider_elem_id, bias_elem_id, nonconform_elem_id, is_triangle) {
+  var bias_text = document.getElementById(bias_elem_id);
+  var nonconform_text = document.getElementById(nonconform_elem_id);
+  return new DoubleSlider(document.getElementById(slider_elem_id),{
+        backgrounds:[
+                {color:"#555",icon:"ds_sad.png"},
+                {color:"#aaa",icon:"ds_happy.png"},
+                {color:"#555",icon:"ds_sad.png"}
+        ],
+        values:[is_triangle ? window.TRIANGLE_BIAS : window.SQUARE_BIAS, is_triangle ? window.TRIANGLE_NONCONFORM : window.SQUARE_NONCONFORM],
+        onChange:function(values){
+                
+                if (is_triangle) {
+                  window.TRIANGLE_BIAS = values[0];
+                  window.TRIANGLE_NONCONFORM = values[1];
+                } else {
+                  window.SQUARE_BIAS = values[0];
+                  window.SQUARE_NONCONFORM = values[1];
+                }
 
-		// Write stats
-		START_SIM = false;
-		window.writeStats();
-		bias_text.innerHTML = Math.round(window.BIAS*100)+"%";
-		nonconform_text.innerHTML = Math.round(window.NONCONFORM*100)+"%";
+                // Write stats
+                START_SIM = false;
+                window.writeStats();
+                bias_text.innerHTML = Math.round(values[0]*100)+"%";
+                nonconform_text.innerHTML = Math.round(values[1]*100)+"%";
 
-	}
-});
+        }
+  });
+}
+
+var whatever = makeSlider("slider_triangle", "bias_text_triangle", "nonconform_text_triangle", true);
+var whatever = makeSlider("slider_square", "bias_text_square", "nonconform_text_square", false);
 
 </script>
